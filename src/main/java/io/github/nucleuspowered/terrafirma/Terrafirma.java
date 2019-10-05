@@ -119,6 +119,7 @@ public class Terrafirma {
         ConfigurationTransformation transformation =
                 ConfigurationTransformation.versionedBuilder()
                         .setVersionKey(VERSION_KEY)
+                        .addVersion(1, ConfigurationTransformation.builder().build())
                         .build();
         transformation.apply(commentedConfigurationNode);
     }
