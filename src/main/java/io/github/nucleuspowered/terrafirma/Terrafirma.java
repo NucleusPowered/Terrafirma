@@ -5,6 +5,7 @@ import static io.github.nucleuspowered.terrafirma.config.TerrafirmaConfig.VERSIO
 import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
+import io.github.nucleuspowered.terrafirma.command.DumpBlockStatesCommand;
 import io.github.nucleuspowered.terrafirma.config.Layer;
 import io.github.nucleuspowered.terrafirma.config.LayerTranslator;
 import io.github.nucleuspowered.terrafirma.config.TerrafirmaConfig;
@@ -22,6 +23,7 @@ import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.asset.Asset;
 import org.spongepowered.api.block.BlockTypes;
+import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
 import org.spongepowered.api.config.DefaultConfig;
 import org.spongepowered.api.event.game.GameRegistryEvent;
@@ -30,6 +32,9 @@ import org.spongepowered.api.event.Listener;
 import org.spongepowered.api.event.game.state.GamePreInitializationEvent;
 import org.spongepowered.api.plugin.Plugin;
 import org.spongepowered.api.plugin.PluginContainer;
+import org.spongepowered.api.service.permission.PermissionDescription;
+import org.spongepowered.api.service.permission.PermissionService;
+import org.spongepowered.api.text.Text;
 import org.spongepowered.api.world.gen.WorldGeneratorModifier;
 
 import java.io.IOException;
@@ -51,9 +56,12 @@ public class Terrafirma {
     private final Logger logger;
     private final ConfigurationLoader<CommentedConfigurationNode> loader;
     private final Path configPath;
+    private final Path dir;
 
     @Inject
-    public Terrafirma(Logger logger, @DefaultConfig(sharedRoot = false) Path path) {
+    public Terrafirma(Logger logger,
+            @ConfigDir(sharedRoot = false) Path dir,
+            @DefaultConfig(sharedRoot = false) Path path) {
         TypeSerializerCollection typeSerializers = TypeSerializers.newCollection();
         typeSerializers.registerType(LayerTranslator.TYPE_TOKEN, LayerTranslator.INSTANCE);
         this.logger = logger;
@@ -62,11 +70,28 @@ public class Terrafirma {
                 .setDefaultOptions(ConfigurationOptions.defaults().setSerializers(typeSerializers))
                 .build();
         this.configPath = path;
+        this.dir = dir;
     }
 
     @Listener
     public void onServerStart(GamePreInitializationEvent event) {
         this.logger.info("Starting Nucleus Terrafirma");
+        Sponge.getCommandManager()
+                .register(
+                        this,
+                        CommandSpec.builder()
+                            .executor(new DumpBlockStatesCommand(this.dir))
+                            .permission("terrafirma.dumpblocks")
+                            .build(),
+                        "genblocksfile"
+                );
+        Sponge.getServiceManager()
+                .provideUnchecked(PermissionService.class)
+                .newDescriptionBuilder(this)
+                .assign(PermissionDescription.ROLE_ADMIN, true)
+                .id("terrafirma.dumpblocks")
+                .description(Text.of("Allows a user to run /genblocksfile"))
+                .register();
     }
 
     @Listener
