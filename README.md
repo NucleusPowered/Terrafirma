@@ -142,6 +142,9 @@ generators {
 version=1
 ```
 
+Available block IDs can be discovered using the `/genblocksfile` command, which will print the block IDs to a file in the Terrafirma
+config directory (requiring the `terrafirma.dumpblocks` permission). 
+
 The server then needs to be restarted, which will then allow you to create a world with the name "testworld" using the following Nucleus 
 command (other world management plugins will vary)
 
