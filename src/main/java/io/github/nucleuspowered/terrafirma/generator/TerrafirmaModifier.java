@@ -2,7 +2,7 @@ package io.github.nucleuspowered.terrafirma.generator;
 
 import com.google.common.collect.ImmutableMap;
 import io.github.nucleuspowered.terrafirma.config.Layer;
-import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.data.DataContainer;
 import org.spongepowered.api.util.annotation.NonnullByDefault;
@@ -24,10 +24,10 @@ public class TerrafirmaModifier implements WorldGeneratorModifier {
     private final BiomeType biomeType;
     private final BiomeGenerator biomeGenerator;
     private final GenerationPopulator generationPopulator;
-    private final Map<Integer, BlockType> layers;
+    private final Map<Integer, BlockState> layers;
 
-    private static Map<Integer, BlockType> createMapping(List<Layer> layers) {
-        ImmutableMap.Builder<Integer, BlockType> builder = ImmutableMap.builder();
+    private static Map<Integer, BlockState> createMapping(List<Layer> layers) {
+        ImmutableMap.Builder<Integer, BlockState> builder = ImmutableMap.builder();
         int y = 0;
         for (Layer layer : layers) {
             for (int x = 1; x <= layer.getLayers(); ++x) {
@@ -46,7 +46,7 @@ public class TerrafirmaModifier implements WorldGeneratorModifier {
         this.layers = createMapping(layers);
         this.biomeGenerator = buffer -> buffer.getBiomeWorker().fill((x, y, z) -> this.biomeType);
         this.generationPopulator = (world, buffer, biomes) ->
-                buffer.getBlockWorker().fill((x, y, z) -> this.layers.getOrDefault(y, BlockTypes.AIR).getDefaultState());
+                buffer.getBlockWorker().fill((x, y, z) -> this.layers.getOrDefault(y, BlockTypes.AIR.getDefaultState()));
     }
 
     @Override

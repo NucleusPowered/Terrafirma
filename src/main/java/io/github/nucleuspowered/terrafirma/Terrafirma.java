@@ -6,6 +6,7 @@ import com.google.common.collect.Lists;
 import com.google.common.reflect.TypeToken;
 import com.google.inject.Inject;
 import io.github.nucleuspowered.terrafirma.command.DumpBlockStatesCommand;
+import io.github.nucleuspowered.terrafirma.config.BlockStateTranslator;
 import io.github.nucleuspowered.terrafirma.config.Layer;
 import io.github.nucleuspowered.terrafirma.config.LayerTranslator;
 import io.github.nucleuspowered.terrafirma.config.TerrafirmaConfig;
@@ -22,6 +23,7 @@ import ninja.leaping.configurate.transformation.ConfigurationTransformation;
 import org.slf4j.Logger;
 import org.spongepowered.api.Sponge;
 import org.spongepowered.api.asset.Asset;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockTypes;
 import org.spongepowered.api.command.spec.CommandSpec;
 import org.spongepowered.api.config.ConfigDir;
@@ -64,6 +66,7 @@ public class Terrafirma {
             @DefaultConfig(sharedRoot = false) Path path) {
         TypeSerializerCollection typeSerializers = TypeSerializers.newCollection();
         typeSerializers.registerType(LayerTranslator.TYPE_TOKEN, LayerTranslator.INSTANCE);
+        typeSerializers.registerType(BlockStateTranslator.BLOCK_STATE_TYPE_TOKEN, BlockStateTranslator.INSTANCE);
         this.logger = logger;
         this.loader = HoconConfigurationLoader.builder()
                 .setPath(path)
@@ -103,11 +106,11 @@ public class Terrafirma {
                         "example", new TerrafirmaGenerator()
                                 .setLayers(
                                         Lists.newArrayList(
-                                                new Layer(2, BlockTypes.BEDROCK),
-                                                new Layer(1, BlockTypes.OBSIDIAN),
-                                                new Layer(3, BlockTypes.STONE),
-                                                new Layer(3, BlockTypes.DIRT),
-                                                new Layer(1, BlockTypes.GRASS)
+                                                new Layer(2, BlockTypes.BEDROCK.getDefaultState()),
+                                                new Layer(1, BlockTypes.OBSIDIAN.getDefaultState()),
+                                                new Layer(3, BlockTypes.STONE.getDefaultState()),
+                                                new Layer(3, BlockTypes.DIRT.getDefaultState()),
+                                                new Layer(1, BlockTypes.GRASS.getDefaultState())
                                         )
                                 )
                 );

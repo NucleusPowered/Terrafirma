@@ -1,13 +1,13 @@
 package io.github.nucleuspowered.terrafirma.config;
 
-import org.spongepowered.api.block.BlockType;
+import org.spongepowered.api.block.BlockState;
 
 public class Layer {
 
     private final int layers;
-    private final BlockType blockType;
+    private final BlockState blockType;
 
-    public Layer(int layers, BlockType blockType) {
+    public Layer(int layers, BlockState blockType) {
         this.layers = layers;
         this.blockType = blockType;
     }
@@ -16,7 +16,7 @@ public class Layer {
         return layers;
     }
 
-    public BlockType getBlockType() {
+    public BlockState getBlockType() {
         return blockType;
     }
 }

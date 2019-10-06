@@ -7,7 +7,6 @@ import ninja.leaping.configurate.objectmapping.ObjectMappingException;
 import ninja.leaping.configurate.objectmapping.serialize.TypeSerializer;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.checkerframework.checker.nullness.qual.Nullable;
-import org.spongepowered.api.block.BlockType;
 
 @SuppressWarnings("UnstableApiUsage")
 public class LayerTranslator implements TypeSerializer<Layer> {
@@ -18,8 +17,6 @@ public class LayerTranslator implements TypeSerializer<Layer> {
     private static final String LAYERS_KEY = "layers";
     private static final String BLOCK_TYPE_KEY = "block";
 
-    private static final TypeToken<BlockType> BLOCK_TYPE_TYPE_TOKEN = TypeToken.of(BlockType.class);
-
     private LayerTranslator() {}
 
     @Nullable
@@ -27,7 +24,7 @@ public class LayerTranslator implements TypeSerializer<Layer> {
     public Layer deserialize(@NonNull TypeToken<?> type, @NonNull ConfigurationNode value) throws ObjectMappingException {
         return new Layer(
                 value.getNode(LAYERS_KEY).getInt(),
-                value.getNode(BLOCK_TYPE_KEY).getValue(BLOCK_TYPE_TYPE_TOKEN)
+                value.getNode(BLOCK_TYPE_KEY).getValue(BlockStateTranslator.BLOCK_STATE_TYPE_TOKEN)
         );
     }
 
@@ -37,7 +34,7 @@ public class LayerTranslator implements TypeSerializer<Layer> {
             setComment(value.getNode(LAYERS_KEY), "The number of layers for this block.")
                     .setValue(obj.getLayers());
             setComment(value.getNode(BLOCK_TYPE_KEY), "The block for this layer.")
-                    .setValue(BLOCK_TYPE_TYPE_TOKEN, obj.getBlockType());
+                    .setValue(BlockStateTranslator.BLOCK_STATE_TYPE_TOKEN, obj.getBlockType());
         }
     }
 

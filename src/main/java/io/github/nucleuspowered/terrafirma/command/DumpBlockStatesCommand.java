@@ -3,6 +3,7 @@ package io.github.nucleuspowered.terrafirma.command;
 import org.checkerframework.checker.nullness.qual.NonNull;
 import org.spongepowered.api.Platform;
 import org.spongepowered.api.Sponge;
+import org.spongepowered.api.block.BlockState;
 import org.spongepowered.api.block.BlockType;
 import org.spongepowered.api.command.CommandException;
 import org.spongepowered.api.command.CommandResult;
@@ -18,12 +19,18 @@ import java.io.PrintWriter;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.StandardOpenOption;
+import java.util.Collection;
 import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 import java.util.stream.Collectors;
 
 public class DumpBlockStatesCommand implements CommandExecutor {
 
+    private static final Pattern PATTERN = Pattern.compile("variant=([a-z0-9_]+)");
     private final Path configDirectory;
 
     public DumpBlockStatesCommand(Path configDirectory) {
@@ -38,17 +45,50 @@ public class DumpBlockStatesCommand implements CommandExecutor {
             throw new CommandException(Text.of(TextColors.RED, file.toString(), " already exists. Delete this file to generate a new file."));
         }
 
-        List<String> strings = Sponge.getRegistry().getAllOf(BlockType.class)
+        Collection<BlockState> states = Sponge.getRegistry().getAllOf(BlockState.class);
+        Map<String, String> typeMap = new HashMap<>();
+        for (BlockState state : states) {
+            // get the type.
+            BlockType type = state.getType();
+
+            String id = state.getId();
+            Matcher matcher = PATTERN.matcher(id);
+            String name;
+            String i = state.getType().getId();
+            if (matcher.find()) {
+                i += "[variant=" + matcher.group(1) + "]";
+                if (typeMap.containsKey(i)) {
+                    continue;
+                }
+
+                name = state.getName();
+                if (name.isEmpty() || name.startsWith(state.getType().getId())) {
+                    name = state.getType().getTranslation().get();
+                }
+            } else {
+                if (typeMap.containsKey("")) {
+                    continue;
+                }
+
+                name = type.getTranslation().get();
+            }
+
+            typeMap.put(i, name);
+        }
+
+        List<String> s = typeMap
+                .entrySet()
                 .stream()
-                .map(blockType -> blockType.getTranslation().get(src.getLocale()) + " = " + blockType.getId())
+                .map(entry -> entry.getValue() + " = " + entry.getKey())
                 .sorted(Comparator.naturalOrder())
                 .collect(Collectors.toList());
+
 
         try (PrintWriter stream = new PrintWriter(new OutputStreamWriter(Files.newOutputStream(file, StandardOpenOption.CREATE_NEW)))) {
             stream.println("# A list of block types to their IDs.");
             stream.println("# Block name = block id.");
             stream.println("# ---------------------------------- #");
-            strings.forEach(stream::println);
+            s.forEach(stream::println);
             stream.println("# ---------------------------------- #");
 
             String mName = Sponge.getPlatform().getContainer(Platform.Component.GAME).getName();

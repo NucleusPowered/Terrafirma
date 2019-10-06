@@ -142,8 +142,61 @@ generators {
 version=1
 ```
 
+You might want to add a sandstone double slab in the middle instead, and a layer of dark oak planks on top! The generator might
+then look like:
+
+```hocon
+    test2 {
+        # The biome for the generator.
+        # 
+        # NOTE: Setting this to something other than minecraft:void may cause unintended populator effects, suchas turning stone to gravel between dirt and stone levels.
+        biome-type="minecraft:void"
+        # Sets the layers in the flat world. In order, from bottom up.
+        layers=[
+            {
+                # The block for this layer.
+                block="minecraft:bedrock"
+                # The number of layers for this block.
+                layers=2
+            },
+            {
+                # The block for this layer.
+                block="minecraft:obsidian"
+                # The number of layers for this block.
+                layers=1
+            },
+            {
+                # The block for this layer.
+                block="minecraft:double_stone_slab[variant=sandstone]"
+                # The number of layers for this block.
+                layers=5
+            },
+            {
+                # The block for this layer.
+                block="minecraft:dirt"
+                # The number of layers for this block.
+                layers=3
+            },
+            {
+                # The block for this layer.
+                block="minecraft:grass"
+                # The number of layers for this block.
+                layers=1
+            },
+            # minecraft:double_wooden_slab[variant=dark_oak]
+            {
+                # The block for this layer.
+                block="minecraft:double_wooden_slab[variant=dark_oak]"
+                # The number of layers for this block.
+                layers=1
+            }
+        ]
+    }
+```
+
 Available block IDs can be discovered using the `/genblocksfile` command, which will print the block IDs to a file in the Terrafirma
-config directory (requiring the `terrafirma.dumpblocks` permission). 
+config directory (requiring the `terrafirma.dumpblocks` permission). The block IDs accept both standard IDs and block states, particularly
+with the variant state. When 1.14.x comes around, block states won't be necessary.
 
 The server then needs to be restarted, which will then allow you to create a world with the name "testworld" using the following Nucleus 
 command (other world management plugins will vary)
@@ -155,4 +208,4 @@ command (other world management plugins will vary)
 Note that the biome is of the "minecraft:void" type. If you set it to a different biome type, there _may_ be other side effects that
 you may not be expecting.
 
-Blocks currently require the `minecraft:` prefix. Blocks that require meta are currently not supported - but may be in the future.
+Blocks currently require the `minecraft:` prefix.
