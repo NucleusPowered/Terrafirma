@@ -58,20 +58,29 @@ public class DumpBlockStatesCommand implements CommandExecutor {
             String name;
             String i = state.getType().getId();
             StringBuilder extra = new StringBuilder();
+            StringBuilder text = new StringBuilder();
+            String variant = null;
+            String colour = null;
             if (variantMatcher.find()) {
                 extra.append("variant=").append(variantMatcher.group(1));
+                text.append("(Variant: ").append(variantMatcher.group(1).replaceAll("_", " "));
             }
 
             if (colourMatcher.find()) {
                 if (extra.length() > 0) {
                     extra.append(",");
+                    text.append(", ");
+                } else {
+                    text.append("(");
                 }
 
                 extra.append("color=").append(colourMatcher.group(1));
+                text.append("Colour: ").append(colourMatcher.group(1).replaceAll("_", " "));
             }
 
             if (extra.length() > 0) {
                 i += "[" + extra.toString() + "]";
+                text.append(")");
             }
 
             if (typeMap.containsKey(i)) {
@@ -81,6 +90,10 @@ public class DumpBlockStatesCommand implements CommandExecutor {
             name = state.getName();
             if (name.isEmpty() || name.startsWith(state.getType().getId())) {
                 name = state.getType().getTranslation().get();
+            }
+
+            if (extra.length() > 0) {
+                name += " " + text.toString();
             }
 
             typeMap.put(i, name);
