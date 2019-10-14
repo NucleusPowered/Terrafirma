@@ -30,7 +30,8 @@ import java.util.stream.Collectors;
 
 public class DumpBlockStatesCommand implements CommandExecutor {
 
-    private static final Pattern PATTERN = Pattern.compile("variant=([a-z0-9_]+)");
+    private static final Pattern VARIANT_PATTERN = Pattern.compile("variant=([a-z0-9_]+)");
+    private static final Pattern COLOUR_PATTERN = Pattern.compile("color=([a-z0-9_]+)");
     private final Path configDirectory;
 
     public DumpBlockStatesCommand(Path configDirectory) {
@@ -52,25 +53,34 @@ public class DumpBlockStatesCommand implements CommandExecutor {
             BlockType type = state.getType();
 
             String id = state.getId();
-            Matcher matcher = PATTERN.matcher(id);
+            Matcher variantMatcher = VARIANT_PATTERN.matcher(id);
+            Matcher colourMatcher = VARIANT_PATTERN.matcher(id);
             String name;
             String i = state.getType().getId();
-            if (matcher.find()) {
-                i += "[variant=" + matcher.group(1) + "]";
-                if (typeMap.containsKey(i)) {
-                    continue;
+            StringBuilder extra = new StringBuilder();
+            if (variantMatcher.find()) {
+                extra.append("variant=").append(variantMatcher.group(1));
+            }
+
+            if (colourMatcher.find()) {
+                if (extra.length() > 0) {
+                    extra.append(",");
                 }
 
-                name = state.getName();
-                if (name.isEmpty() || name.startsWith(state.getType().getId())) {
-                    name = state.getType().getTranslation().get();
-                }
-            } else {
-                if (typeMap.containsKey("")) {
-                    continue;
-                }
+                extra.append("color=").append(colourMatcher.group(1));
+            }
 
-                name = type.getTranslation().get();
+            if (extra.length() > 0) {
+                i += "[" + extra.toString() + "]";
+            }
+
+            if (typeMap.containsKey(i)) {
+                continue;
+            }
+
+            name = state.getName();
+            if (name.isEmpty() || name.startsWith(state.getType().getId())) {
+                name = state.getType().getTranslation().get();
             }
 
             typeMap.put(i, name);
