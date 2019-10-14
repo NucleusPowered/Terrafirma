@@ -54,7 +54,7 @@ public class DumpBlockStatesCommand implements CommandExecutor {
 
             String id = state.getId();
             Matcher variantMatcher = VARIANT_PATTERN.matcher(id);
-            Matcher colourMatcher = VARIANT_PATTERN.matcher(id);
+            Matcher colourMatcher = COLOUR_PATTERN.matcher(id);
             String name;
             String i = state.getType().getId();
             StringBuilder extra = new StringBuilder();
